@@ -23,7 +23,7 @@ import {
     WebServerFactory,
 } from "./services";
 
-const defaultTinyliciousPort = 3000;
+const defaultTinyliciousPort = 7070;
 
 export class TinyliciousResourcesFactory implements utils.IResourcesFactory<TinyliciousResources> {
     public async create(config: Provider): Promise<TinyliciousResources> {
