@@ -18,7 +18,20 @@ npm run start
 ```
 
 ## Configuration
+### Port
+By default, Tinylicious uses port 3000.  Configure the port number by setting an environment variable
+named PORT to the desired number.  For example:
+```sh
+PORT=6502 npm run start
+```
 
+You will need to specify the same port number in the application.  For example, when testing with the
+[Webpack Fluid Loader](../../packages/tools/webpack-fluid-loader):
+```sh
+npm run start:tinylicious -- --env.tinyliciousPort=6502
+```
+
+### Storage
 The config.json file can be used to configure the Tinylicious service.
 
 | Parameter        | Description                                                      | Default                          |
