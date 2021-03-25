@@ -46,9 +46,7 @@ export async function deliCreate(config: Provider): Promise<core.IPartitionLambd
         reconnectOnError: (err) => err.message.includes("ETIMEDOUT"),
     };
     if (redisConfig.tls) {
-        redisOptions.tls = {
-            servername: redisConfig.host,
-        };
+        redisOptions.tls = true as any;
     }
     const publisher = new services.SocketIoRedisPublisher(redisOptions);
 

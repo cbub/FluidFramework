@@ -138,10 +138,7 @@ export class AlfredResourcesFactory implements utils.IResourcesFactory<AlfredRes
             reconnectOnError: (err) => err.message.includes("ETIMEDOUT"),
         };
         if (redisConfig2.tls) {
-            redisOptions2.tls = {
-                servername: redisConfig2.host,
-                checkServerIdentity: () => undefined,
-            };
+            redisOptions2.tls = true as any;
         }
         const redisClient = new Redis(redisOptions2);
 
@@ -208,9 +205,7 @@ export class AlfredResourcesFactory implements utils.IResourcesFactory<AlfredRes
             showFriendlyErrorStack: true,
         };
         if (redisConfigForThrottling.tls) {
-            redisOptionsForThrottling.tls = {
-                servername: redisConfigForThrottling.host,
-            };
+            redisOptionsForThrottling.tls = true as any;
         }
         const redisClientForThrottling = new Redis(redisOptionsForThrottling);
 

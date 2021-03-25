@@ -91,10 +91,7 @@ export function create(
         showFriendlyErrorStack: true,
     };
     if (redisConfig.tls) {
-        options.tls = {
-            servername: redisConfig.host,
-            checkServerIdentity: () => undefined,
-        };
+        options.tls = true as any;
     }
 
     const pub = new Redis(_.clone(options));
