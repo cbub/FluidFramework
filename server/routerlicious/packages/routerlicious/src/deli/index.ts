@@ -71,7 +71,11 @@ export async function deliCreate(config: Provider): Promise<core.IPartitionLambd
     if (redisConfig.tls) {
         redisOptions.tls = {
             servername: redisConfig.host,
-            checkServerIdentity: () => undefined,
+            checkServerIdentity: (serverName, cert) => {
+                console.log("CHECK SERVER IDENTITY: serverName=", serverName);
+                console.log("cert:", cert);
+                return undefined;
+            },
         };
     }
     const publisher = new services.SocketIoRedisPublisher(redisOptions);
