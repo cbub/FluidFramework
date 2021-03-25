@@ -65,12 +65,13 @@ export async function deliCreate(config: Provider): Promise<core.IPartitionLambd
         password: redisConfig.pass,
         connectTimeout: 20000,
         maxRetriesPerRequest: 3,
-        showFriendlyErrorStack: true,
         reconnectOnError: (err) => err.message.includes("ETIMEDOUT"),
+        showFriendlyErrorStack: true,
     };
     if (redisConfig.tls) {
         redisOptions.tls = {
             servername: redisConfig.host,
+            checkServerIdentity: () => undefined,
         };
     }
     const publisher = new services.SocketIoRedisPublisher(redisOptions);
