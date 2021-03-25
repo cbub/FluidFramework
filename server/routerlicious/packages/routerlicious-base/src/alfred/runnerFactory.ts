@@ -210,7 +210,6 @@ export class AlfredResourcesFactory implements utils.IResourcesFactory<AlfredRes
         if (redisConfigForThrottling.tls) {
             redisOptionsForThrottling.tls = {
                 servername: redisConfigForThrottling.host,
-                checkServerIdentity: () => undefined,
             };
         }
         const redisClientForThrottling = new Redis(redisOptionsForThrottling);
