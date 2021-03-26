@@ -42,7 +42,7 @@ export class SocketIoRedisPublisher implements core.IPublisher {
         this.io = socketIoEmitter(this.redisClient);
 
         this.redisClient.on("error", (error) => {
-            //TEST
+            // TEST
             console.log("SOCKETIOREDISHPUBLISHER EMITTING ERROR FROM REDIS CLIENT:", error);
         });
     }
