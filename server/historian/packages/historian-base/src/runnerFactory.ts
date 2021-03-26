@@ -82,7 +82,7 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         const throttleMinCooldownIntervalInMs = config.get("throttling:minCooldownIntervalInMs") as number | undefined;
         const minThrottleIntervalInMs = config.get("throttling:minThrottleIntervalInMs") as number | undefined;
         const throttleStorageManager = new services.RedisThrottleStorageManager(redisClientForThrottling);
-        const throttlerHelper = new services.ThrottlerHelper(w
+        const throttlerHelper = new services.ThrottlerHelper(
             throttleStorageManager,
             throttleMaxRequestsPerMs,
             throttleMaxRequestBurst,
