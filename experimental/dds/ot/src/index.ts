@@ -3,5 +3,6 @@
  * Licensed under the MIT License.
  */
 
-export * from "./ot";
-export * from "./interfaces";
+export { SharedOT } from "./ot";
+export { OTFactory } from "./factory";
+export { IOTType } from "./types";

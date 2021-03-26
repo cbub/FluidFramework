@@ -10,10 +10,13 @@ import {
     MockStorage,
 } from "@fluidframework/test-runtime-utils";
 import { Jsonable } from "@fluidframework/datastore-definitions";
-import { SharedOT } from "../ot";
-import { OTFactory } from "../factory";
+import { SharedJson1, Json1Factory } from "./json1";
 
-const createLocalOT = (id: string) => new SharedOT(id, new MockFluidDataStoreRuntime(), OTFactory.Attributes);
+// eslint-disable-next-line max-len
+const createLocalOT = (id: string) => {
+    const factory = SharedJson1.getFactory();
+    return factory.create(new MockFluidDataStoreRuntime(), id) as SharedJson1;
+}
 
 function createConnectedOT(id: string, runtimeFactory: MockContainerRuntimeFactory) {
     // Create and connect a second SharedCell.
@@ -24,14 +27,14 @@ function createConnectedOT(id: string, runtimeFactory: MockContainerRuntimeFacto
         objectStorage: new MockStorage(),
     };
 
-    const ot = new SharedOT(id, dataStoreRuntime, OTFactory.Attributes);
+    const ot = new SharedJson1(id, dataStoreRuntime, (Json1Factory as any).Attributes);
     ot.connect(services);
     return ot;
 }
 
 describe("OT", () => {
     describe("Local state", () => {
-        let ot: SharedOT;
+        let ot: SharedJson1;
 
         beforeEach(() => {
             ot = createLocalOT("OT");
@@ -96,8 +99,8 @@ describe("OT", () => {
     });
 
     describe("Connected state", () => {
-        let ot1: SharedOT;
-        let ot2: SharedOT;
+        let ot1: SharedJson1;
+        let ot2: SharedJson1;
         let containerRuntimeFactory: MockContainerRuntimeFactory;
 
         describe("APIs", () => {

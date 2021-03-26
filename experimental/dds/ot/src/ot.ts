@@ -16,40 +16,15 @@ import {
     IChannelAttributes,
     IFluidDataStoreRuntime,
     IChannelStorageService,
-    IChannelFactory,
-    Serializable,
 } from "@fluidframework/datastore-definitions";
 import { SharedObject } from "@fluidframework/shared-object-base";
-import { Doc, type, JSONOp, replaceOp, insertOp, moveOp, removeOp } from "ot-json1";
-import { OTFactory } from "./factory";
 import { debug } from "./debug";
-import { ISharedOT } from "./interfaces";
+import { IOTType } from "./types";
 
-export class SharedOT extends SharedObject implements ISharedOT {
-    private readonly pendingOps: JSONOp[] = [];
+export abstract class SharedOT<T, TOp, TInit = T> extends SharedObject {
+    private readonly pendingOps: TOp[] = [];
 
-    /**
-     * Create a new shared OT
-     *
-     * @param runtime - data store runtime the new shared map belongs to
-     * @param id - optional name of the shared map
-     * @returns newly create shared map (but not attached yet)
-     */
-    public static create(runtime: IFluidDataStoreRuntime, id?: string) {
-        return runtime.createChannel(id, OTFactory.Type) as SharedOT;
-    }
-
-    /**
-     * Get a factory for SharedOT to register with the data store.
-     *
-     * @returns a factory that creates and load SharedOT
-     */
-    public static getFactory(): IChannelFactory {
-        return new OTFactory();
-    }
-
-    // eslint-disable-next-line no-null/no-null
-    private root: Doc = null;
+    private root!: T;
 
     /**
      * Constructs a new shared OT. If the object is non-local an id and service interfaces will
@@ -62,26 +37,12 @@ export class SharedOT extends SharedObject implements ISharedOT {
         super(id, runtime, attributes);
     }
 
-    public get(): Doc { return this.root; }
+    protected abstract get otType(): IOTType<T, TOp, TInit>;
 
-    public insert(path: (string | number)[], value: Serializable) {
-        this.apply(insertOp(path, value as Doc));
-    }
+    public get(): T { return this.root; }
 
-    public move(from: (string | number)[], to: (string | number)[]) {
-        this.apply(moveOp(from, to));
-    }
-
-    public remove(path: (string | number)[], value?: boolean) {
-        this.apply(removeOp(path, value));
-    }
-
-    public replace(path: (string | number)[], oldValue: Serializable, newValue: Serializable) {
-        this.apply(replaceOp(path, oldValue as Doc, newValue as Doc));
-    }
-
-    public apply(op: JSONOp) {
-        this.root = type.apply(this.root, op) as Doc;
+    public apply(op: TOp) {
+        this.root = this.otType.apply(this.root, op);
 
         // If we are not attached, don't submit the op.
         if (!this.isAttached()) {
@@ -116,8 +77,10 @@ export class SharedOT extends SharedObject implements ISharedOT {
         this.root = this.runtime.IFluidSerializer.parse(rawContent);
     }
 
+    protected abstract get initialValue(): TInit;
+
     protected initializeLocalCore() {
-        this.root = {};
+        this.root = this.otType.create(this.initialValue);
     }
 
     protected registerCore() {}
@@ -133,10 +96,10 @@ export class SharedOT extends SharedObject implements ISharedOT {
             let remoteOp = message.contents;
 
             for (const localPendingOp of this.pendingOps) {
-                remoteOp = type.transformNoConflict(remoteOp, localPendingOp, "right");
+                remoteOp = this.otType.transform(remoteOp, localPendingOp, "right");
             }
 
-            this.root = type.apply(this.root, remoteOp) as Doc;
+            this.root = this.otType.apply(this.root, remoteOp);
         }
     }
 
