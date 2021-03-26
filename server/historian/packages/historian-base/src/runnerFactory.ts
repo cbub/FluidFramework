@@ -40,6 +40,7 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfig.pass,
+            connect_timeout: 20000,
         };
         if (redisConfig.tls) {
             redisOptions.tls = {
@@ -66,6 +67,7 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfigForThrottling.pass,
+            connect_timeout: 20000,
         };
         if (redisConfigForThrottling.tls) {
             redisOptionsForThrottling.tls = {
@@ -82,7 +84,7 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         const throttleMinCooldownIntervalInMs = config.get("throttling:minCooldownIntervalInMs") as number | undefined;
         const minThrottleIntervalInMs = config.get("throttling:minThrottleIntervalInMs") as number | undefined;
         const throttleStorageManager = new services.RedisThrottleStorageManager(redisClientForThrottling);
-        const throttlerHelper = new services.ThrottlerHelper(
+        const throttlerHelper = new services.ThrottlerHelper(w
             throttleStorageManager,
             throttleMaxRequestsPerMs,
             throttleMaxRequestBurst,
