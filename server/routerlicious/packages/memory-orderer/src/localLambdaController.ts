@@ -49,6 +49,9 @@ export class LocalLambdaController extends EventEmitter implements IKafkaSubscri
                 this.close();
             }
         } catch (ex) {
+            // TEST-
+            console.log("LAMBDA LOCAL CONTROLLER CATCH EXCEPTION", ex);
+
             // In the event a lambda fails to start, retry it
             this.context.error(ex, { restart: true });
 

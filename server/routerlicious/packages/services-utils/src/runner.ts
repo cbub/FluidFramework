@@ -71,6 +71,8 @@ export async function run<T extends IResources>(
             await runner
                     .stop()
                     .catch((innerError) => {
+                        // TEST
+                        console.log("RUNNER CATCHING ERROR: ", innerError);
                         logger?.error(`Could not stop runner due to error: ${innerError}`);
                     });
             return Promise.reject(error);
@@ -109,6 +111,7 @@ export function runService<T extends IResources>(
             process.exit(0);
         },
         (error) => {
+            console.log("RUNNER PROMISE ERROR HANDLER", error);
             logger?.error(`${group} service exiting due to error`);
             logger?.error(inspect(error));
             process.exit(1);
