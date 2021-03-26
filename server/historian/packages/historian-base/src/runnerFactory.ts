@@ -36,7 +36,7 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         const redisConfig = config.get("redis");
         const redisOptions: redis.ClientOpts = {
             retry_strategy: (options) => {
-                console.log("HISTORIAN: DETERMINING RETRY STRATEGY");
+                winston.info("HISTORIAN: DETERMINING RETRY STRATEGY");
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfig.pass,
@@ -60,7 +60,13 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
 
         // Redis connection for throttling.
         const redisConfigForThrottling = config.get("redisForThrottling");
-        const redisOptionsForThrottling: redis.ClientOpts = { password: redisConfigForThrottling.pass };
+        const redisOptionsForThrottling: redis.ClientOpts = {
+            retry_strategy: (options) => {
+                winston.info("HISTORIAN THROTTLE: DETERMINING RETRY STRATEGY");
+                return Math.min(options.attempt * 100, 3000);
+            },
+            password: redisConfigForThrottling.pass,
+        };
         if (redisConfigForThrottling.tls) {
             redisOptionsForThrottling.tls = {
                 serverName: redisConfigForThrottling.host,
