@@ -34,7 +34,13 @@ export class HistorianResources implements utils.IResources {
 export class HistorianResourcesFactory implements utils.IResourcesFactory<HistorianResources> {
     public async create(config: Provider): Promise<HistorianResources> {
         const redisConfig = config.get("redis");
-        const redisOptions: redis.ClientOpts = { password: redisConfig.pass };
+        const redisOptions: redis.ClientOpts = {
+            retry_strategy: (options) => {
+                console.log("HISTORIAN: DETERMINING RETRY STRATEGY");
+                return Math.min(options.attempt * 100, 3000);
+            },
+            password: redisConfig.pass,
+        };
         if (redisConfig.tls) {
             redisOptions.tls = {
                 serverName: redisConfig.host,
