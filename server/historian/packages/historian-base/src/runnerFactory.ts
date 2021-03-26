@@ -40,7 +40,6 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfig.pass,
-            connect_timeout: 20000,
         };
         if (redisConfig.tls) {
             redisOptions.tls = {
@@ -67,7 +66,6 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfigForThrottling.pass,
-            connect_timeout: 20000,
         };
         if (redisConfigForThrottling.tls) {
             redisOptionsForThrottling.tls = {
