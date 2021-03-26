@@ -51,6 +51,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisConfig.port,
             redisConfig.host,
             redisOptions);
+        redisClient.on("error", (err) => {
+            winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+        })
         const gitCache = new historianServices.RedisCache(redisClient);
         const tenantCache = new historianServices.RedisTenantCache(redisClient);
         // Create services
@@ -76,6 +79,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisConfigForThrottling.port,
             redisConfigForThrottling.host,
             redisOptionsForThrottling);
+        redisClientForThrottling.on("error", (err) => {
+            winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+        })
 
         const throttleMaxRequestsPerMs = config.get("throttling:maxRequestsPerMs") as number | undefined;
         const throttleMaxRequestBurst = config.get("throttling:maxRequestBurst") as number | undefined;
