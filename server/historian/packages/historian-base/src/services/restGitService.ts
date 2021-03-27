@@ -362,7 +362,7 @@ export class RestGitService {
                     if (error) {
                         return reject(error);
                     } else if (response.statusCode !== statusCode) {
-                        winston.info(response.body);
+                        // winston.info(response.body);
                         return reject(response.statusCode);
                     } else {
                         return resolve(response.body);
@@ -377,7 +377,7 @@ export class RestGitService {
     private setCache<T>(key: string, value: T) {
         // Attempt to cache to Redis - log any errors but don't fail
         this.cache.set(key, value).catch((error) => {
-            winston.error(`Error caching ${key} to redis`, error);
+            winston.error(`${Date.now()} Error caching ${key} to redis`, error);
         });
     }
 
@@ -385,17 +385,17 @@ export class RestGitService {
         if (useCache) {
             // Attempt to grab the value from the cache. Log any errors but don't fail the request
             const cachedValue = await this.cache.get<T>(key).catch((error) => {
-                winston.error(`Error fetching ${key} from cache`, error);
+                winston.error(`${Date.now()} Error fetching ${key} from cache`, error);
                 return null;
             });
 
             if (cachedValue) {
-                winston.info(`Resolving ${key} from cache`);
+                // winston.info(`Resolving ${key} from cache`);
                 return cachedValue;
             }
 
             // Value is not cached - fetch it with the provided function and then cache the value
-            winston.info(`Fetching ${key}`);
+            // winston.info(`Fetching ${key}`);
             const value = await fetch();
             this.setCache(key, value);
 

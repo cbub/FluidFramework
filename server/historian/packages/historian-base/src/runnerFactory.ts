@@ -36,7 +36,6 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         const redisConfig = config.get("redis");
         const redisOptions: redis.ClientOpts = {
             retry_strategy: () => {
-                winston.info("HISTORIAN: DETERMINING RETRY STRATEGY");
                 return 5000;
             },
             password: redisConfig.pass,
@@ -52,12 +51,27 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisConfig.port,
             redisConfig.host,
             redisOptions);
+
+        redisClient.on("ready", () => {
+            winston.info(`${Date.now()} HISTORIAN REDIS CLIENT READY`);
+        });
+
+        redisClient.on("connect", () => {
+            winston.info(`${Date.now()} HISTORIAN REDIS CLIENT CONNECTED`);
+        });
+
         redisClient.on("error", (err) => {
             winston.info(` ${Date.now()} HISTORIAN REDIS CLIENT ERROR: `, err);
         });
+
         redisClient.on("reconnecting", (msg) => {
             winston.info(`${Date.now()} HISTORIAN RECONNECTING. delay=`,msg.delay, "attempt=", msg.attempt);
         });
+
+        redisClient.on("end", () => {
+            winston.info(`${Date.now()} HISTORIAN REDIS CLIENT ENDED`);
+        });
+
         const gitCache = new historianServices.RedisCache(redisClient);
         const tenantCache = new historianServices.RedisTenantCache(redisClient);
         // Create services
@@ -69,7 +83,6 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         const redisConfigForThrottling = config.get("redisForThrottling");
         const redisOptionsForThrottling: redis.ClientOpts = {
             retry_strategy: () => {
-                winston.info(`${Date.now()} HISTORIAN THROTTLE: DETERMINING RETRY STRATEGY`);
                 return 5000;
             },
             password: redisConfigForThrottling.pass,

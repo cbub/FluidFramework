@@ -40,7 +40,7 @@ export class RiddlerService implements ITenantService {
             return null;
         });
         if (cachedDetail) {
-            winston.info(`Resolving tenant details from cache`);
+            // winston.info(`Resolving tenant details from cache`);
             return JSON.parse(cachedDetail) as ITenantConfig;
         }
         const details = await request.get(
@@ -64,7 +64,7 @@ export class RiddlerService implements ITenantService {
         });
 
         if (cachedToken) {
-            winston.info(`Resolving token from cache`);
+            // winston.info(`Resolving token from cache`);
             return;
         }
 
