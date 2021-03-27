@@ -40,10 +40,11 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfig.pass,
+            enable_offline_queue: false,
         };
         if (redisConfig.tls) {
             redisOptions.tls = {
-                serverName: redisConfig.host,
+                servername: redisConfig.host,
             };
         }
 
@@ -53,6 +54,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisOptions);
         redisClient.on("error", (err) => {
             winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+        });
+        redisClient.on("reconnecting", (msg) => {
+            winston.info("HISTORIAN RECONNECTING. delay=",msg.delay, "attempt=", msg.attempt);
         });
         const gitCache = new historianServices.RedisCache(redisClient);
         const tenantCache = new historianServices.RedisTenantCache(redisClient);
@@ -69,10 +73,11 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
                 return Math.min(options.attempt * 100, 3000);
             },
             password: redisConfigForThrottling.pass,
+            enable_offline_queue: false,
         };
         if (redisConfigForThrottling.tls) {
             redisOptionsForThrottling.tls = {
-                serverName: redisConfigForThrottling.host,
+                servername: redisConfigForThrottling.host,
             };
         }
         const redisClientForThrottling = redis.createClient(
@@ -81,6 +86,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisOptionsForThrottling);
         redisClientForThrottling.on("error", (err) => {
             winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+        });
+        redisClientForThrottling.on("reconnecting", (msg) => {
+            winston.info("HISTORIAN RECONNECTING. delay=",msg.delay, "attempt=", msg.attempt);
         });
 
         const throttleMaxRequestsPerMs = config.get("throttling:maxRequestsPerMs") as number | undefined;
