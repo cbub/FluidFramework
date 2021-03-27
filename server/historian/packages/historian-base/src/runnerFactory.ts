@@ -35,9 +35,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
     public async create(config: Provider): Promise<HistorianResources> {
         const redisConfig = config.get("redis");
         const redisOptions: redis.ClientOpts = {
-            retry_strategy: (options) => {
+            retry_strategy: () => {
                 winston.info("HISTORIAN: DETERMINING RETRY STRATEGY");
-                return Math.min(options.attempt * 100, 3000);
+                return 5000;
             },
             password: redisConfig.pass,
             enable_offline_queue: false,
@@ -53,10 +53,10 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisConfig.host,
             redisOptions);
         redisClient.on("error", (err) => {
-            winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+            winston.info(` ${Date.now()} HISTORIAN REDIS CLIENT ERROR: `, err);
         });
         redisClient.on("reconnecting", (msg) => {
-            winston.info("HISTORIAN RECONNECTING. delay=",msg.delay, "attempt=", msg.attempt);
+            winston.info(`${Date.now()} HISTORIAN RECONNECTING. delay=`,msg.delay, "attempt=", msg.attempt);
         });
         const gitCache = new historianServices.RedisCache(redisClient);
         const tenantCache = new historianServices.RedisTenantCache(redisClient);
@@ -68,9 +68,9 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
         // Redis connection for throttling.
         const redisConfigForThrottling = config.get("redisForThrottling");
         const redisOptionsForThrottling: redis.ClientOpts = {
-            retry_strategy: (options) => {
-                winston.info("HISTORIAN THROTTLE: DETERMINING RETRY STRATEGY");
-                return Math.min(options.attempt * 100, 3000);
+            retry_strategy: () => {
+                winston.info(`${Date.now()} HISTORIAN THROTTLE: DETERMINING RETRY STRATEGY`);
+                return 5000;
             },
             password: redisConfigForThrottling.pass,
             enable_offline_queue: false,
@@ -85,10 +85,10 @@ export class HistorianResourcesFactory implements utils.IResourcesFactory<Histor
             redisConfigForThrottling.host,
             redisOptionsForThrottling);
         redisClientForThrottling.on("error", (err) => {
-            winston.info("HISTORIAN REDIS CLIENT ERROR: ", err);
+            winston.info(`${Date.now()} HISTORIAN REDIS CLIENT ERROR: `, err);
         });
         redisClientForThrottling.on("reconnecting", (msg) => {
-            winston.info("HISTORIAN RECONNECTING. delay=",msg.delay, "attempt=", msg.attempt);
+            winston.info(`${Date.now()} HISTORIAN RECONNECTING. delay=`,msg.delay, "attempt=", msg.attempt);
         });
 
         const throttleMaxRequestsPerMs = config.get("throttling:maxRequestsPerMs") as number | undefined;

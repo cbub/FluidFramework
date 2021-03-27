@@ -36,7 +36,7 @@ export class RiddlerService implements ITenantService {
 
     private async getTenantDetails(tenantId: string): Promise<ITenantConfig> {
         const cachedDetail = await this.cache.get(tenantId).catch((error) => {
-            winston.error(`Error fetching tenant details from cache`, error);
+            winston.error(`${Date.now()} Error fetching tenant details from cache`, error);
             return null;
         });
         if (cachedDetail) {
